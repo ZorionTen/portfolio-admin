@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/table"
 import { fetchSessions, fetchStats, type SessionSummary, type Stats } from "@/lib/api"
 import { clearAdminKey } from "@/lib/auth"
+import { ThemeToggle } from "@/components/ThemeToggle"
 
 interface DashboardProps {
   adminKey: string
@@ -75,9 +76,12 @@ export function Dashboard({ adminKey, onLogout }: DashboardProps) {
       <header className="border-b-2 bg-card">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
           <h1 className="font-head text-2xl">Portfolio Admin</h1>
-          <Button variant="secondary" size="sm" onClick={handleLogout}>
-            Log out
-          </Button>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Button variant="secondary" size="sm" onClick={handleLogout}>
+              Log out
+            </Button>
+          </div>
         </div>
       </header>
 

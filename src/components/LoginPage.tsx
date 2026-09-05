@@ -10,6 +10,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { storeAdminKey, validatePasskey } from "@/lib/auth"
+import { ThemeToggle } from "@/components/ThemeToggle"
 
 interface LoginPageProps {
   onLogin: (adminKey: string) => void
@@ -45,6 +46,9 @@ export function LoginPage({ onLogin }: LoginPageProps) {
 
   return (
     <div className="flex min-h-svh items-center justify-center bg-background p-4">
+      <div className="fixed top-4 right-4">
+        <ThemeToggle />
+      </div>
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle className="font-head text-2xl">Admin Login</CardTitle>

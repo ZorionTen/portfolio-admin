@@ -6,6 +6,23 @@ export interface SessionSummary {
   emails: string[]
 }
 
+export interface ChatMessage {
+  id: string
+  role: "user" | "assistant"
+  content: string
+  sources: string[]
+  createdAt: string
+}
+
+export interface SessionDetail {
+  sessionId: string
+  messageCount: number
+  firstActivity: string
+  lastActivity: string
+  emails: string[]
+  messages: ChatMessage[]
+}
+
 export interface ContactIntent {
   id: string
   name: string | null
@@ -39,4 +56,34 @@ export function fetchSessions(adminKey: string): Promise<SessionSummary[]> {
 
 export function fetchStats(adminKey: string): Promise<Stats> {
   return adminFetch<Stats>("/api/admin/stats", adminKey)
+}
+
+export function fetchSessionDetail(
+  adminKey: string,
+  sessionId: string,
+): Promise<SessionDetail> {
+  return adminFetch<SessionDetail>(
+    `/api/admin/sessions/${encodeURIComponent(sessionId)}`,
+    adminKey,
+  )
+}
+
+export function fetchContactIntentsBySession(
+  adminKey: string,
+  sessionId: string,
+): Promise<ContactIntent[]> {
+  return adminFetch<ContactIntent[]>(
+    `/api/admin/contact-intents/session/${encodeURIComponent(sessionId)}`,
+    adminKey,
+  )
+}
+
+export function fetchChats(
+  adminKey: string,
+  sessionId: string,
+): Promise<ChatMessage[]> {
+  return adminFetch<ChatMessage[]>(
+    `/api/admin/chats/${encodeURIComponent(sessionId)}`,
+    adminKey,
+  )
 }

@@ -18,12 +18,12 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { fetchSessions, fetchStats, type SessionSummary, type Stats } from "@/lib/api"
-import { clearAdminKey } from "@/lib/auth"
 import { ThemeToggle } from "@/components/ThemeToggle"
 
 interface DashboardProps {
   adminKey: string
   onLogout: () => void
+  onSelectSession: (sessionId: string) => void
 }
 
 function formatDate(iso: string): string {
@@ -37,7 +37,11 @@ function shortId(id: string): string {
   return id.slice(0, 8)
 }
 
-export function Dashboard({ adminKey, onLogout }: DashboardProps) {
+export function Dashboard({
+  adminKey,
+  onLogout,
+  onSelectSession,
+}: DashboardProps) {
   const [sessions, setSessions] = useState<SessionSummary[] | null>(null)
   const [stats, setStats] = useState<Stats | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -67,7 +71,6 @@ export function Dashboard({ adminKey, onLogout }: DashboardProps) {
   }, [adminKey])
 
   function handleLogout() {
-    clearAdminKey()
     onLogout()
   }
 
@@ -97,7 +100,7 @@ export function Dashboard({ adminKey, onLogout }: DashboardProps) {
             <CardHeader>
               <CardDescription>Total sessions</CardDescription>
               <CardTitle className="font-head text-4xl">
-                {stats ? stats.totalSessions : <Skeleton className="h-9 w-16" />}
+                {error ? "—" : stats ? stats.totalSessions : <Skeleton className="h-9 w-16" />}
               </CardTitle>
             </CardHeader>
           </Card>
@@ -105,7 +108,7 @@ export function Dashboard({ adminKey, onLogout }: DashboardProps) {
             <CardHeader>
               <CardDescription>Contact intents</CardDescription>
               <CardTitle className="font-head text-4xl">
-                {stats ? (
+                {error ? "—" : stats ? (
                   stats.totalContactIntents
                 ) : (
                   <Skeleton className="h-9 w-16" />
@@ -117,7 +120,7 @@ export function Dashboard({ adminKey, onLogout }: DashboardProps) {
             <CardHeader>
               <CardDescription>Most recent contact</CardDescription>
               <CardTitle className="font-head text-lg">
-                {stats ? (
+                {error ? "—" : stats ? (
                   stats.mostRecentContact?.email ?? "—"
                 ) : (
                   <Skeleton className="h-7 w-32" />
@@ -135,7 +138,9 @@ export function Dashboard({ adminKey, onLogout }: DashboardProps) {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {sessions === null ? (
+            {error ? (
+              <p className="text-muted-foreground">Unable to load sessions.</p>
+            ) : sessions === null ? (
               <div className="flex flex-col gap-2">
                 <Skeleton className="h-10 w-full" />
                 <Skeleton className="h-10 w-full" />
@@ -156,7 +161,20 @@ export function Dashboard({ adminKey, onLogout }: DashboardProps) {
                 </TableHeader>
                 <TableBody>
                   {sessions.map((session) => (
-                    <TableRow key={session.sessionId}>
+                    <TableRow
+                      key={session.sessionId}
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`Open session ${shortId(session.sessionId)}`}
+                      className="cursor-pointer focus-visible:outline-2 focus-visible:outline-primary"
+                      onClick={() => onSelectSession(session.sessionId)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault()
+                          onSelectSession(session.sessionId)
+                        }
+                      }}
+                    >
                       <TableCell className="font-mono text-xs">
                         {shortId(session.sessionId)}
                       </TableCell>
